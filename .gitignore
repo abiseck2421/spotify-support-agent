@@ -1,0 +1,10 @@
+venv/
+__pycache__/
+.ipynb_checkpoints/
+*.pyc
+.env
+
+data/raw/
+data/processed/
+data/retrieval/
+PROGRESS.local.md

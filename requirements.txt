@@ -1,0 +1,7 @@
+pandas
+numpy
+sentence-transformers
+faiss-cpu
+google-generativeai
+python-dotenv
+scikit-learn
