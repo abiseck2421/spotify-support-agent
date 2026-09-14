@@ -7,4 +7,7 @@ __pycache__/
 data/raw/
 data/processed/
 data/retrieval/
+data/golden/
+data/intent/
+results/
 PROGRESS.local.md
