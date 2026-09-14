@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import logging
 import os
+import re
 import time
 from pathlib import Path
 
@@ -72,7 +73,7 @@ def generate(
             raise
         except Exception as e:  # noqa: BLE001 - surface after retries
             last_err = e
-            time.sleep(2 ** attempt)
+            time.sleep(backoff_sleep(e, attempt))
     raise RuntimeError(f"Gemini failed after {retries} retries: {last_err}") from last_err
 
 
@@ -128,6 +129,17 @@ def jsonify(block: str) -> str:
         if s.lower().startswith("json"):
             s = s[4:]
     return s.strip()
+
+
+def backoff_sleep(e: Exception, attempt: int) -> float:
+    """Wait that respects the API's own rate-limit RTT estimate when given."""
+    s = str(e)
+    m = re.search(r"Please retry in (\d+(?:\.\d+)?)s?", s)
+    if m:
+        return float(m.group(1)) + 2.0   # API's retry delay + buffer
+    if "429" in s or "RESOURCE_EXHAUSTED" in s or "QUOTA" in s.upper():
+        return float(2 ** attempt) + 2.0
+    return float(2 ** attempt)
 
 
 __all__ = ["NoApiKeyError", "generate", "batch_generate", "jsonify", "pick_model"]
