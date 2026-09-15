@@ -33,12 +33,14 @@ DEFAULT_SIZE = 8591  # FULL corpus chosen by the Day 4 recall experiment
 
 
 class Retriever:
-    def __init__(self, size: int = DEFAULT_SIZE) -> None:
+    def __init__(self, size: int = DEFAULT_SIZE, name: str | None = None) -> None:
         self.size = int(size)
-        d = OUT / str(self.size)
+        subdir = name if name is not None else str(self.size)
+        d = OUT / subdir
         if not (d / "index.faiss").exists() or not (d / "slice.json").exists():
             raise FileNotFoundError(
-                f"No corpus built for size {self.size}. Run build_index.py first."
+                f"No corpus built at data/retrieval/{subdir}. "
+                "Run build_index.py (RAG) or build_escalation_index.py (escalation)."
             )
         self.index = faiss.read_index(str(d / "index.faiss"))
         self.meta = json.loads((d / "slice.json").read_text(encoding="utf-8"))
